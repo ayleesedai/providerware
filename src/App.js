@@ -1,19 +1,15 @@
 import React, { useMemo } from 'react';
 import { useReducer, Provider } from './codux';
-import './App.css';
 
 const Counter = ({ name }) => {
   const [state, dispatch] = useReducer((state, { type }) => type === 'INC' ? ({ name, count: state.count + 1 }) : state, { name, count: 0 });
+  const onClick = useMemo(() => () => dispatch({ type: 'INC' }), []);
   return (
-    <div onClick={() => dispatch({ type: 'INC' })} style={{ color: 'red', padding: '1em' }}>{`${name}: ${state.count}`}</div>
+    <div onClick={onClick} style={{ fontWeight: 'normal', cursor: 'pointer', color: 'white', padding: '1em' }}>{`${name}: ${state.count}`}</div>
   );
 }
 
-const AParent = ({ children }) => <div style={{ backgroundColor: 'black'}}>{children}</div>
-
-const AnotherParent = ({ children }) => <div style={{ backgroundColor: 'blue'}}>{children}</div>
-
-const AThirdParent = ({ children }) => <div style={{ backgroundColor: 'yellow'}}>{children}</div>
+const AComponent = ({ color: backgroundColor, children }) => <div style={{ backgroundColor }}>{children}</div>
 
 const App = () => {
   const loggerMiddleware = useMemo(() => (dispatch, action, state) => {
@@ -24,18 +20,21 @@ const App = () => {
     console.groupEnd();
   });
   return (
-    <div className="App">
+    <div style={{ width: '33%', fontSize: '1.5em', fontWeight: 'bold', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <Provider middlewares={[loggerMiddleware]}>
-        <Counter name="Primo" />
-        <AnotherParent>
-          <AThirdParent>
-            <Counter name="Secondo" />
-          </AThirdParent>
-          <Counter name="Terzo" />
-        </AnotherParent>
-        <AParent>
-          <Counter name="Quarto" />
-        </AParent>
+        {"Click on any bar to increment its counter"}
+        <AComponent color="green">
+          <Counter name="First"/>
+        </AComponent>
+        <AComponent color="blue">
+          <AComponent color="black">
+            <Counter name="Second" />
+          </AComponent>
+          <Counter name="Third" />
+        </AComponent>
+        <AComponent color="magenta">
+          <Counter name="Fourth" />
+        </AComponent>
       </Provider>
     </div>
   );
