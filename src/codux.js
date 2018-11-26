@@ -19,13 +19,6 @@ const Provider = ({ middlewares, children }) => {
                         ? midds.pop()(next, action, state, dispatch)
                         : dispatch(action);
                 next(action);
-                /*if (hasMiddlewares(middlewares)) {
-                    middlewares.forEach(middleware =>
-                        middleware(dispatch, action, state)
-                    );
-                } else {
-                    dispatch(action);
-                }*/
             };
             return [state, wrappedDispatch];
         },
