@@ -7,17 +7,25 @@ import React, {
 
 const context = createContext();
 
+const hasMiddlewares = middlewares => middlewares && middlewares.length > 0;
+
 const Provider = ({ middlewares, children }) => {
     const wrapReducer = useMemo(
         () => ([state, dispatch]) => {
             const wrappedDispatch = action => {
-                if (!middlewares || middlewares.length === 0) {
-                    dispatch(action);
-                } else {
+                const midds = [...middlewares];
+                const next = action =>
+                    hasMiddlewares(midds)
+                        ? midds.pop()(next, action, state, dispatch)
+                        : dispatch(action);
+                next(action);
+                /*if (hasMiddlewares(middlewares)) {
                     middlewares.forEach(middleware =>
                         middleware(dispatch, action, state)
                     );
-                }
+                } else {
+                    dispatch(action);
+                }*/
             };
             return [state, wrappedDispatch];
         },
